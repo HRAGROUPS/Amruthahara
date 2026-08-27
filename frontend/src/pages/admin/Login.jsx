@@ -37,8 +37,9 @@ function Login() {
       const data = await adminLogin(username, password);
 
       saveToken(data.token);
+      localStorage.setItem("adminToken", data.token);
 
-      navigate("/admin/dashboard");
+      navigate("/admin/dashboard", { replace: true });
     } catch (err) {
       setError(err.message || "Invalid username or password.");
     } finally {

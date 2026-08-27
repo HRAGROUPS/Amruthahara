@@ -392,6 +392,7 @@ function Login() {
         data.success &&
         data.user
       ) {
+        saveToken(data.token);
         login(data.user);
 
         const destination =
@@ -430,6 +431,7 @@ function Login() {
       }
 
       saveToken(adminData.token);
+      localStorage.setItem("adminToken", adminData.token);
 
       navigate("/admin/dashboard", {
         replace: true,

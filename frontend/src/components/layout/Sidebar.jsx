@@ -15,8 +15,9 @@ function Sidebar() {
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("token");
+    localStorage.removeItem("amruthahara_token");
 
-    navigate("/login");
+    navigate("/admin/login", { replace: true });
   };
 
   const linkStyle = {
