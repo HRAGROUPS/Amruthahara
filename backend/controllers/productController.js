@@ -19,7 +19,7 @@ exports.createProduct = async (req, res) => {
       inventoryPrice,
     } = req.body;
 
-    const BASE_URL = "http://localhost:5000";
+    const BASE_URL = process.env.API_BASE_URL || `${req.protocol}://${req.get("host")}`;
 
     // Get uploaded images
     const images =
@@ -137,7 +137,7 @@ exports.updateProduct = async (req, res) => {
       });
     }
 
-    const BASE_URL = "http://localhost:5000";
+    const BASE_URL = process.env.API_BASE_URL || `${req.protocol}://${req.get("host")}`;
 
     // Update normal fields
     product.name =

@@ -6,83 +6,44 @@ const {
   Env,
 } = require("@phonepe-pg/pg-sdk-node");
 
-const clientId =
-  process.env.PHONEPE_CLIENT_ID;
+const getPhonePeConfig = () => {
+  const clientId = process.env.PHONEPE_CLIENT_ID;
+  const clientSecret = process.env.PHONEPE_CLIENT_SECRET;
+  const clientVersion = Number(process.env.PHONEPE_CLIENT_VERSION);
+  const environmentName = (
+    process.env.PHONEPE_ENVIRONMENT || process.env.PHONEPE_ENV || "SANDBOX"
+  ).toUpperCase();
 
-const clientSecret =
-  process.env.PHONEPE_CLIENT_SECRET;
-
-const clientVersion = Number(
-  process.env.PHONEPE_CLIENT_VERSION
-);
-
-const environment =
-  process.env.PHONEPE_ENVIRONMENT ===
-  "PRODUCTION"
-    ? Env.PRODUCTION
-    : Env.SANDBOX;
-
-console.log(
-  "\n======================================"
-);
-
-console.log(
-  "PhonePe Configuration Check"
-);
-
-console.log(
-  "======================================"
-);
-
-console.log(
-  "Client ID:",
-  clientId ? "✅ Loaded" : "❌ Missing"
-);
-
-console.log(
-  "Client Version:",
-  clientVersion
-    ? "✅ Loaded"
-    : "❌ Missing"
-);
-
-console.log(
-  "Client Secret:",
-  clientSecret
-    ? "✅ Loaded"
-    : "❌ Missing"
-);
-
-console.log(
-  "Environment:",
-  process.env.PHONEPE_ENVIRONMENT ||
-    "SANDBOX"
-);
-
-console.log(
-  "======================================\n"
-);
-
-if (
-  !clientId ||
-  !clientSecret ||
-  !clientVersion
-) {
-  throw new Error(
-    "PhonePe environment variables are missing"
-  );
-}
-
-const client =
-  StandardCheckoutClient.getInstance(
+  return {
     clientId,
     clientSecret,
     clientVersion,
-    environment
+    environment:
+      environmentName === "PRODUCTION" ? Env.PRODUCTION : Env.SANDBOX,
+    environmentName,
+  };
+};
+
+const getPhonePeClient = () => {
+  const config = getPhonePeConfig();
+
+  if (!config.clientId || !config.clientSecret || !config.clientVersion) {
+    throw new Error(
+      "PhonePe is not configured. Set PHONEPE_CLIENT_ID, PHONEPE_CLIENT_SECRET, and PHONEPE_CLIENT_VERSION."
+    );
+  }
+
+  return StandardCheckoutClient.getInstance(
+    config.clientId,
+    config.clientSecret,
+    config.clientVersion,
+    config.environment
   );
+};
 
 module.exports = {
-  client,
+  getPhonePeClient,
   StandardCheckoutPayRequest,
   Env,
+  getPhonePeConfig,
 };

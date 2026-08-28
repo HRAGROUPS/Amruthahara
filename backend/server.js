@@ -4,10 +4,10 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const connectDB = require("./config/db");
+const { requireDatabase } = require("./config/db");
 
 const phonepeRoutes = require("./routes/phonepeRoutes"); 
-const adminRoutes = require("./routes/adminRoutes");
+const adminRoutes = require("./routes/Adminroutes");
 const productRoutes = require("./routes/ProductRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -67,6 +67,14 @@ app.use(
 );
 
 // TEST ROUTE
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "AMRUTHAHARA BACKEND IS WORKING",
+    service: "amruthahara-api",
+  });
+});
+
 app.get("/hello-test", (req, res) => {
   res.json({
     success: true,
@@ -79,12 +87,12 @@ app.get("/hello-test", (req, res) => {
 // ==========================================
 
 
-app.use("/api/products", productRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/api/products", requireDatabase, productRoutes);
+app.use("/api/admin", requireDatabase, adminRoutes);
 
-app.use("/api/payment", paymentRoutes);
+app.use("/api/payment", requireDatabase, paymentRoutes);
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", requireDatabase, authRoutes);
 
 // ==========================================
 // PHONEPE ROUTES
@@ -136,17 +144,19 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
-  await connectDB();
+if (require.main === module) {
+  const connectDB = require("./config/db");
 
   app.listen(PORT, () => {
     console.log("--------------------------------------");
     console.log(`🚀 Server Running on Port ${PORT}`);
   });
-};
 
-startServer().catch((error) => {
-  console.error("❌ Server startup failed:", error.message);
-  process.exit(1);
-});
+  connectDB().catch((error) => {
+    console.error("⚠️ Database is unavailable:", error.message);
+    console.error("Database-backed routes will return HTTP 503 until it is configured.");
+  });
+}
+
+module.exports = app;
 

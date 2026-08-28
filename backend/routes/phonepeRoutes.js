@@ -2,7 +2,7 @@ const express = require("express");
 const { randomUUID } = require("crypto");
 
 const {
-  client,
+  getPhonePeClient,
   StandardCheckoutPayRequest,
 } = require("../services/phonepeService");
 
@@ -72,8 +72,17 @@ router.post("/create-order", async (req, res) => {
     const merchantOrderId =
       "AMR_" + randomUUID();
 
+    const frontendUrl = process.env.FRONTEND_URL;
+
+    if (!frontendUrl) {
+      return res.status(503).json({
+        success: false,
+        message: "Payment redirect is not configured. Set FRONTEND_URL.",
+      });
+    }
+
     const redirectUrl =
-      "http://localhost:5173/payment-success";
+      `${frontendUrl.replace(/\/$/, "")}/payment-success`;
 
     console.log(
       "Merchant Order ID:",
@@ -104,7 +113,7 @@ router.post("/create-order", async (req, res) => {
     );
 
     const response =
-      await client.pay(request);
+      await getPhonePeClient().pay(request);
 
     console.log(
       "✅ PhonePe payment created"
