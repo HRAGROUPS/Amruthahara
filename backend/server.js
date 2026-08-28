@@ -7,7 +7,7 @@ const path = require("path");
 const { requireDatabase } = require("./config/db");
 
 const phonepeRoutes = require("./routes/phonepeRoutes"); 
-const adminRoutes = require("./routes/Adminroutes");
+const adminRoutes = require("./routes/adminRoutes");
 const productRoutes = require("./routes/ProductRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -22,9 +22,10 @@ console.log("======================================");
 
 
 // Middleware
-app.use(cors());
-
-app.use(express.json({ limit: "1000mb" }));
+app.use(cors()); 
+ 
+app.use(express.json({ limit: "1000mb" })); 
+// Middleware
 app.use(
   cors({
     origin: true,
@@ -32,14 +33,16 @@ app.use(
   })
 );
 
-
-// =====================================================
-// JSON
-// =====================================================
-
 app.use(
   express.json({
     limit: "1000mb",
+  })
+);
+
+app.use(
+  express.urlencoded({
+    limit: "100mb",
+    extended: true,
   })
 );
 
@@ -148,15 +151,12 @@ if (require.main === module) {
   const connectDB = require("./config/db");
 
   app.listen(PORT, () => {
-    console.log("--------------------------------------");
     console.log(`🚀 Server Running on Port ${PORT}`);
   });
 
   connectDB().catch((error) => {
     console.error("⚠️ Database is unavailable:", error.message);
-    console.error("Database-backed routes will return HTTP 503 until it is configured.");
   });
 }
 
 module.exports = app;
-
