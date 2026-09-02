@@ -34,7 +34,7 @@ const articles = [
     tag: "Farmer Stories",
   },
   {
-    image: image5,
+    image: image1,
     header: "Morning Rituals: Grounding Yourself with Nature's Elements",
     text: "Simple, mindful practices incorporating natural herbs and raw honey to start your day with intention and clarity.",
     time: "6 min read",
@@ -74,7 +74,7 @@ const OurStory = () => {
         <JournalFilters active="/our-story" />
 
         <section className="ah-journal-featured">
-          <img src={image1} alt="Honey" />
+          <img src={image5} alt="Honey" />
           <div className="ah-journal-featured-copy">
             <span className="ah-journal-meta">Featured • Honey • 8 min read</span>
             <h2>The Liquid Gold of Raw Forest Honey</h2>
