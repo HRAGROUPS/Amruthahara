@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import { API_BASE_URL } from "../../services/apiBase";
@@ -16,693 +15,436 @@ const STATUS_LABELS = {
 };
 
 const statusStyle = (status) => {
-  if (status === "approved") {
-    return {
-      background: "#EAF7EC",
-      color: "#2F6B3F",
-      border: "1px solid #CBE6D0",
-    };
-  }
-
-  if (status === "declined") {
-    return {
+  const styles = {
+    pending: {
+      background: "#FFF4D6",
+      color: "#9A6700",
+      border: "1px solid #F2D58A",
+    },
+    approved: {
+      background: "#E8F7EC",
+      color: "#247A3B",
+      border: "1px solid #B9E3C3",
+    },
+    declined: {
       background: "#FDECEC",
       color: "#B42318",
-      border: "1px solid #F5CACA",
-    };
-  }
-
-  return {
-    background: "#FFF8E8",
-    color: "#8A6A2F",
-    border: "1px solid #EAD9A9",
+      border: "1px solid #F2B8B5",
+    },
   };
+
+  return styles[status] || styles.pending;
 };
 
 const formatDate = (value) => {
-  if (!value) {
+  if (!value) return "—";
+
+  try {
+    return new Date(value).toLocaleString("en-IN", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  } catch {
     return "—";
   }
-
-  return new Date(value).toLocaleString("en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
 };
 
-// =====================================================
-// STYLES
-// =====================================================
-
 const styles = {
-  // ===================================================
-  // MAIN LAYOUT — SAME AS ORDERS PAGE
-  // ===================================================
-
   container: {
     display: "flex",
     minHeight: "100vh",
     width: "100%",
-    backgroundColor: "#F5F8F3",
+    background: "#F5F8F3",
   },
 
   content: {
     marginLeft: "250px",
     width: "calc(100% - 250px)",
+    minWidth: 0,
     padding: "35px",
     boxSizing: "border-box",
-    minWidth: 0,
   },
 
   page: {
     width: "100%",
     maxWidth: "100%",
-    minHeight: "100vh",
-    boxSizing: "border-box",
+    minWidth: 0,
     overflowX: "hidden",
   },
 
-  // ===================================================
-  // HEADER
-  // ===================================================
-
   header: {
-    width: "100%",
     display: "flex",
+    alignItems: "center",
     justifyContent: "space-between",
-    alignItems: "flex-end",
     gap: "20px",
-    marginBottom: "28px",
-    flexWrap: "wrap",
+    marginBottom: "30px",
   },
 
-  headerContent: {
+  headerLeft: {
     minWidth: 0,
-    flex: "1 1 400px",
   },
 
   eyebrow: {
     margin: "0 0 8px",
-    fontSize: "10px",
-    fontWeight: "800",
-    letterSpacing: "2.4px",
-    color: "#A68B4F",
+    fontSize: "12px",
+    fontWeight: "700",
+    letterSpacing: "2px",
+    color: "#7A8B76",
   },
 
   title: {
     margin: 0,
-    fontFamily: "Georgia, serif",
-    fontSize: "clamp(28px, 3vw, 40px)",
-    fontWeight: "500",
+    fontSize: "38px",
     lineHeight: "1.15",
-    color: "#183B28",
+    fontWeight: "700",
+    color: "#263525",
+    letterSpacing: "-0.8px",
   },
 
   subtitle: {
     margin: "9px 0 0",
-    maxWidth: "680px",
-    fontSize: "13px",
+    fontSize: "14px",
     lineHeight: "1.6",
-    color: "#78857C",
+    color: "#748070",
   },
 
   refreshButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "8px",
-    minWidth: "110px",
-    border: "1px solid #D7E2D5",
-    borderRadius: "10px",
-    padding: "11px 17px",
+    flexShrink: 0,
+    border: "1px solid #D6E0D1",
     background: "#FFFFFF",
-    color: "#205A38",
-    fontSize: "12px",
-    fontWeight: "800",
+    color: "#344632",
+    padding: "11px 18px",
+    borderRadius: "10px",
+    fontSize: "13px",
+    fontWeight: "700",
     cursor: "pointer",
-    boxShadow: "0 5px 15px rgba(28,70,42,0.06)",
-    whiteSpace: "nowrap",
+    transition: "all 0.2s ease",
   },
-
-  refreshIcon: {
-    fontSize: "18px",
-    lineHeight: 1,
-  },
-
-  // ===================================================
-  // SUMMARY
-  // ===================================================
 
   summaryGrid: {
-    width: "100%",
     display: "grid",
-    gridTemplateColumns:
-      "repeat(4, minmax(0, 1fr))",
-    gap: "14px",
-    marginBottom: "24px",
-    boxSizing: "border-box",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: "16px",
+    marginBottom: "25px",
   },
 
   summaryCard: {
-    width: "100%",
-    minWidth: 0,
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    padding: "18px",
-    borderRadius: "14px",
     background: "#FFFFFF",
-    border: "1px solid #E3EAE1",
-    boxShadow:
-      "0 8px 25px rgba(30,70,40,0.05)",
+    border: "1px solid #E3EADF",
+    borderRadius: "15px",
+    padding: "20px",
     boxSizing: "border-box",
-  },
-
-  summaryIcon: {
-    width: "40px",
-    height: "40px",
-    minWidth: "40px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "11px",
-    fontSize: "18px",
-    fontWeight: "800",
-  },
-
-  summaryContent: {
     minWidth: 0,
-  },
-
-  summaryNumber: {
-    fontFamily: "Georgia, serif",
-    fontSize: "25px",
-    fontWeight: "600",
-    color: "#203D2B",
-    lineHeight: 1,
   },
 
   summaryLabel: {
-    marginTop: "5px",
+    margin: 0,
     fontSize: "11px",
-    color: "#849087",
     fontWeight: "700",
-    whiteSpace: "nowrap",
+    letterSpacing: "1.3px",
+    color: "#84907F",
+    textTransform: "uppercase",
   },
 
-  // ===================================================
-  // ALERTS
-  // ===================================================
-
-  error: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    marginBottom: "16px",
-    padding: "13px 16px",
-    borderRadius: "9px",
-    background: "#FFF1F1",
-    border: "1px solid #FFD8D8",
-    color: "#B91C1C",
-    fontSize: "13px",
+  summaryValue: {
+    margin: "8px 0 0",
+    fontSize: "28px",
+    fontWeight: "700",
+    color: "#263525",
   },
 
-  success: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    marginBottom: "16px",
-    padding: "13px 16px",
-    borderRadius: "9px",
-    background: "#ECFDF3",
-    border: "1px solid #C8EFD4",
-    color: "#166534",
-    fontSize: "13px",
-    fontWeight: "600",
-  },
-
-  alertIcon: {
-    width: "22px",
-    height: "22px",
-    minWidth: "22px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "50%",
-    background: "rgba(255,255,255,0.7)",
-    fontWeight: "900",
-  },
-
-  // ===================================================
-  // MAIN CARD
-  // ===================================================
-
-  card: {
-    width: "100%",
-    maxWidth: "100%",
+  mainCard: {
     background: "#FFFFFF",
-    borderRadius: "16px",
-    border: "1px solid #E3EAE1",
-    boxShadow:
-      "0 8px 25px rgba(30,70,40,0.05)",
+    border: "1px solid #E3EADF",
+    borderRadius: "18px",
     overflow: "hidden",
-    boxSizing: "border-box",
+    minWidth: 0,
   },
 
   cardHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "20px",
-    padding: "24px 28px",
-    borderBottom: "1px solid #EDF1EC",
-    flexWrap: "wrap",
+    padding: "24px 26px",
+    borderBottom: "1px solid #E8EDE5",
   },
 
   cardEyebrow: {
-    marginBottom: "5px",
-    fontSize: "9px",
-    fontWeight: "800",
-    letterSpacing: "1.8px",
-    color: "#A68B4F",
+    margin: "0 0 5px",
+    fontSize: "11px",
+    fontWeight: "700",
+    letterSpacing: "1.5px",
+    color: "#82907C",
   },
 
   cardTitle: {
     margin: 0,
-    fontFamily: "Georgia, serif",
-    fontSize: "22px",
-    fontWeight: "500",
-    color: "#203D2B",
+    fontSize: "21px",
+    fontWeight: "700",
+    color: "#293729",
   },
-
-  cardSubtitle: {
-    margin: "6px 0 0",
-    fontSize: "12px",
-    color: "#879188",
-  },
-
-  requestCount: {
-    flexShrink: 0,
-    padding: "8px 13px",
-    borderRadius: "999px",
-    background: "#F1F6EF",
-    color: "#39704C",
-    border: "1px solid #DCE8D9",
-    fontSize: "11px",
-    fontWeight: "800",
-  },
-
-  // ===================================================
-  // LOADING
-  // ===================================================
-
-  center: {
-    padding: "65px 20px",
-    textAlign: "center",
-  },
-
-  spinner: {
-    width: "30px",
-    height: "30px",
-    margin: "0 auto 14px",
-    border: "3px solid #DCE8D9",
-    borderTop: "3px solid #176039",
-    borderRadius: "50%",
-  },
-
-  loadingTitle: {
-    fontSize: "14px",
-    fontWeight: "800",
-    color: "#304A39",
-  },
-
-  loadingText: {
-    marginTop: "5px",
-    fontSize: "12px",
-    color: "#879188",
-  },
-
-  // ===================================================
-  // EMPTY
-  // ===================================================
-
-  empty: {
-    padding: "70px 25px",
-    textAlign: "center",
-  },
-
-  emptyIcon: {
-    width: "58px",
-    height: "58px",
-    margin: "0 auto 18px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "16px",
-    background: "#F1F6EF",
-    color: "#39704C",
-    fontSize: "25px",
-  },
-
-  emptyTitle: {
-    margin: 0,
-    fontFamily: "Georgia, serif",
-    fontSize: "22px",
-    fontWeight: "500",
-    color: "#203D2B",
-  },
-
-  emptyText: {
-    maxWidth: "430px",
-    margin: "8px auto 20px",
-    fontSize: "13px",
-    lineHeight: "1.6",
-    color: "#849087",
-  },
-
-  emptyButton: {
-    border: "none",
-    borderRadius: "9px",
-    padding: "11px 18px",
-    background: "#175C38",
-    color: "#FFFFFF",
-    fontSize: "12px",
-    fontWeight: "800",
-    cursor: "pointer",
-  },
-
-  // ===================================================
-  // REQUEST LIST
-  // ===================================================
 
   list: {
-    width: "100%",
-    maxWidth: "100%",
-    padding: "20px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-    boxSizing: "border-box",
+    padding: "18px",
   },
-
-  // ===================================================
-  // REQUEST CARD
-  // ===================================================
 
   requestCard: {
-    width: "100%",
-    maxWidth: "100%",
-    minWidth: 0,
+    border: "1px solid #E2E9DE",
+    borderRadius: "15px",
     overflow: "hidden",
-    border: "1px solid #E3EAE1",
-    borderRadius: "14px",
-    background: "#FBFCFA",
-    boxSizing: "border-box",
+    background: "#FFFFFF",
+    marginBottom: "16px",
+    minWidth: 0,
   },
-
-  // ===================================================
-  // REQUEST HEADER
-  // ===================================================
 
   requestHeader: {
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: "20px",
-    padding: "20px",
-    background: "#FFFFFF",
-    borderBottom: "1px solid #EDF1EC",
-    flexWrap: "wrap",
+    padding: "21px",
+    background: "#FBFCFA",
+    borderBottom: "1px solid #E8EDE5",
   },
 
   customerSection: {
     display: "flex",
     alignItems: "center",
-    gap: "13px",
+    gap: "14px",
     minWidth: 0,
-    flex: "1 1 350px",
+    flex: 1,
   },
 
   avatar: {
-    width: "46px",
-    height: "46px",
-    minWidth: "46px",
+    width: "48px",
+    height: "48px",
+    minWidth: "48px",
+    borderRadius: "50%",
+    background: "#E8F0E5",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: "12px",
-    background:
-      "linear-gradient(135deg, #1F6942, #3F8059)",
-    color: "#FFFFFF",
-    fontFamily: "Georgia, serif",
-    fontSize: "19px",
-    fontWeight: "600",
+    color: "#496142",
+    fontSize: "17px",
+    fontWeight: "700",
+  },
+
+  customerInfo: {
+    minWidth: 0,
   },
 
   requestNumber: {
-    marginBottom: "3px",
-    fontSize: "9px",
-    fontWeight: "800",
-    letterSpacing: "1.3px",
-    color: "#A68B4F",
+    margin: "0 0 4px",
+    fontSize: "11px",
+    color: "#8A9485",
+    fontWeight: "600",
   },
 
-  requestName: {
-    fontSize: "17px",
-    fontWeight: "800",
-    color: "#203D2B",
+  customerName: {
+    margin: 0,
+    fontSize: "16px",
+    color: "#283628",
+    fontWeight: "700",
     wordBreak: "break-word",
   },
 
   contactRow: {
     display: "flex",
-    alignItems: "center",
-    gap: "15px",
-    marginTop: "5px",
     flexWrap: "wrap",
-    fontSize: "12px",
-    color: "#68766D",
+    gap: "5px 18px",
+    marginTop: "5px",
   },
 
-  // ===================================================
-  // STATUS
-  // ===================================================
+  contactText: {
+    margin: 0,
+    fontSize: "12px",
+    color: "#7B8677",
+    wordBreak: "break-word",
+  },
 
   statusSection: {
-    minWidth: "145px",
-    textAlign: "right",
+    flexShrink: 0,
   },
 
-  statusHeading: {
-    marginBottom: "7px",
-    fontSize: "9px",
-    fontWeight: "800",
-    letterSpacing: "1px",
-    color: "#879188",
-  },
-
-  badge: {
+  statusBadge: {
     display: "inline-flex",
     alignItems: "center",
-    gap: "6px",
-    padding: "6px 10px",
+    justifyContent: "center",
+    padding: "7px 12px",
     borderRadius: "999px",
-    fontSize: "10px",
-    fontWeight: "800",
+    fontSize: "11px",
+    fontWeight: "700",
+    whiteSpace: "nowrap",
   },
-
-  badgeDot: {
-    width: "6px",
-    height: "6px",
-    borderRadius: "50%",
-    background: "currentColor",
-  },
-
-  // ===================================================
-  // DETAILS
-  // ===================================================
 
   detailsContainer: {
-    width: "100%",
-    maxWidth: "100%",
-    minWidth: 0,
     display: "grid",
-    gridTemplateColumns:
-      "repeat(4, minmax(0, 1fr))",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
     gap: "1px",
-    background: "#E8EEE6",
-    borderBottom: "1px solid #E8EEE6",
-    boxSizing: "border-box",
-    overflow: "hidden",
+    background: "#E7ECE4",
+    borderBottom: "1px solid #E7ECE4",
   },
 
   detailItem: {
+    background: "#FFFFFF",
+    padding: "18px",
     minWidth: 0,
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    padding: "15px 17px",
-    background: "#FBFCFA",
-    boxSizing: "border-box",
-    overflow: "hidden",
-  },
-
-  detailIcon: {
-    width: "30px",
-    height: "30px",
-    minWidth: "30px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "8px",
-    background: "#EFF5ED",
-    color: "#39704C",
-    fontSize: "12px",
-    fontWeight: "900",
-  },
-
-  detailContent: {
-    minWidth: 0,
-    maxWidth: "100%",
   },
 
   detailLabel: {
-    marginBottom: "4px",
-    fontSize: "8px",
-    fontWeight: "800",
-    letterSpacing: "1px",
-    color: "#89948C",
+    margin: "0 0 7px",
+    fontSize: "10px",
+    letterSpacing: "1.2px",
+    fontWeight: "700",
+    color: "#8A9485",
   },
 
   detailValue: {
-    minWidth: 0,
-    maxWidth: "100%",
-    fontSize: "12px",
+    margin: 0,
+    fontSize: "14px",
     fontWeight: "700",
-    color: "#405048",
+    color: "#354633",
     wordBreak: "break-word",
-    overflowWrap: "anywhere",
   },
 
-  // ===================================================
-  // NOTES
-  // ===================================================
-
   notes: {
-    padding: "15px 18px",
-    background: "#FFFFFF",
-    borderBottom: "1px solid #E8EEE6",
+    padding: "18px 20px",
+    background: "#FCFDFB",
+    borderBottom: "1px solid #E7ECE4",
   },
 
   notesLabel: {
-    marginBottom: "5px",
-    fontSize: "8px",
-    fontWeight: "800",
-    letterSpacing: "1px",
-    color: "#89948C",
+    margin: "0 0 6px",
+    fontSize: "10px",
+    fontWeight: "700",
+    letterSpacing: "1.2px",
+    color: "#8A9485",
   },
 
-  notesValue: {
-    fontSize: "12px",
-    lineHeight: "1.55",
-    color: "#59665E",
+  notesText: {
+    margin: 0,
+    fontSize: "13px",
+    lineHeight: "1.6",
+    color: "#596457",
+    whiteSpace: "pre-wrap",
     wordBreak: "break-word",
-    overflowWrap: "anywhere",
   },
-
-  // ===================================================
-  // ACTION AREA
-  // ===================================================
 
   actionArea: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     gap: "20px",
-    padding: "16px 18px",
-    background: "#F5F8F3",
-    flexWrap: "wrap",
+    padding: "17px 20px",
   },
 
-  actionInfo: {
-    minWidth: 0,
-    flex: "1 1 300px",
-  },
-
-  actionTitle: {
+  actionText: {
+    margin: 0,
     fontSize: "12px",
-    fontWeight: "800",
-    color: "#304A39",
-  },
-
-  actionDescription: {
-    marginTop: "3px",
-    fontSize: "10px",
-    lineHeight: "1.5",
-    color: "#829087",
+    color: "#7D8779",
   },
 
   statusControl: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
-    flexShrink: 0,
+    gap: "10px",
     minWidth: "190px",
+  },
+
+  statusControlLabel: {
+    fontSize: "11px",
+    fontWeight: "700",
+    color: "#697464",
+    whiteSpace: "nowrap",
   },
 
   select: {
     width: "190px",
-    maxWidth: "100%",
-    padding: "10px 12px",
-    borderRadius: "8px",
-    border: "1px solid #D2DFCF",
+    height: "40px",
+    padding: "0 12px",
+    borderRadius: "9px",
+    border: "1px solid #D5DED0",
     background: "#FFFFFF",
-    color: "#203D2B",
-    fontSize: "12px",
-    fontWeight: "700",
+    color: "#344532",
+    fontSize: "13px",
+    fontWeight: "600",
     outline: "none",
     cursor: "pointer",
     boxSizing: "border-box",
   },
 
-  updating: {
-    whiteSpace: "nowrap",
-    fontSize: "10px",
-    color: "#8A6A2F",
+  alert: {
+    padding: "13px 16px",
+    borderRadius: "10px",
+    marginBottom: "18px",
+    fontSize: "13px",
+    lineHeight: "1.5",
+  },
+
+  error: {
+    background: "#FDECEC",
+    border: "1px solid #F3C1BE",
+    color: "#A4261B",
+  },
+
+  success: {
+    background: "#EAF7ED",
+    border: "1px solid #BDE2C4",
+    color: "#24713A",
+  },
+
+  loading: {
+    padding: "50px 20px",
+    textAlign: "center",
+    color: "#7B8677",
+    fontSize: "14px",
+  },
+
+  empty: {
+    padding: "55px 20px",
+    textAlign: "center",
+    color: "#788374",
+  },
+
+  emptyTitle: {
+    margin: "0 0 7px",
+    fontSize: "17px",
     fontWeight: "700",
+    color: "#344332",
+  },
+
+  emptyText: {
+    margin: 0,
+    fontSize: "13px",
+  },
+
+  emptyButton: {
+    marginTop: "18px",
+    border: "none",
+    background: "#4D6746",
+    color: "#FFFFFF",
+    padding: "10px 17px",
+    borderRadius: "9px",
+    fontWeight: "700",
+    cursor: "pointer",
   },
 };
 
-// =====================================================
-// ADMIN SUBSCRIPTIONS
-// =====================================================
-
-function AdminSubscriptions() {
+export default function AdminSubscriptions() {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState("");
+  const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
-
-  // ===================================================
-  // FETCH SUBSCRIPTIONS
-  // EXISTING MECHANISM - DO NOT CHANGE
-  // ===================================================
 
   const fetchSubscriptions = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const token =
-        localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken");
 
       const headers = {};
 
       if (token) {
-        headers.Authorization =
-          `Bearer ${token}`;
+        headers.Authorization = `Bearer ${token}`;
       }
 
       const response = await fetch(
@@ -714,20 +456,13 @@ function AdminSubscriptions() {
 
       if (!response.ok || !data.success) {
         throw new Error(
-          data.message ||
-            "Unable to load subscription requests"
+          data.message || "Unable to load subscription requests"
         );
       }
 
-      setSubscriptions(
-        data.subscriptions || []
-      );
+      setSubscriptions(data.subscriptions || []);
     } catch (err) {
-      setError(
-        err.message ||
-          "Unable to load subscription requests"
-      );
-
+      setError(err.message || "Unable to load subscription requests");
       setSubscriptions([]);
     } finally {
       setLoading(false);
@@ -738,27 +473,20 @@ function AdminSubscriptions() {
     fetchSubscriptions();
   }, []);
 
-  // ===================================================
-  // UPDATE STATUS
-  // EXISTING MECHANISM - DO NOT CHANGE
-  // ===================================================
-
   const updateStatus = async (id, status) => {
     try {
       setUpdatingId(id);
       setFeedback("");
       setError("");
 
-      const token =
-        localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken");
 
       const headers = {
         "Content-Type": "application/json",
       };
 
       if (token) {
-        headers.Authorization =
-          `Bearer ${token}`;
+        headers.Authorization = `Bearer ${token}`;
       }
 
       const response = await fetch(
@@ -766,9 +494,7 @@ function AdminSubscriptions() {
         {
           method: "PATCH",
           headers,
-          body: JSON.stringify({
-            status,
-          }),
+          body: JSON.stringify({ status }),
         }
       );
 
@@ -776,748 +502,382 @@ function AdminSubscriptions() {
 
       if (!response.ok || !data.success) {
         throw new Error(
-          data.message ||
-            "Unable to update status"
+          data.message || "Unable to update status"
         );
       }
 
       setSubscriptions((current) =>
         current.map((item) =>
-          item._id === id
-            ? data.subscription
-            : item
+          item._id === id ? data.subscription : item
         )
       );
 
-      setFeedback(
-        "Subscription status updated."
-      );
+      setFeedback("Subscription status updated.");
     } catch (err) {
-      setError(
-        err.message ||
-          "Unable to update status"
-      );
+      setError(err.message || "Unable to update status");
     } finally {
       setUpdatingId("");
     }
   };
 
-  // ===================================================
-  // SUMMARY COUNTS
-  // ===================================================
+  const pendingCount = subscriptions.filter(
+    (item) => item.status === "pending"
+  ).length;
 
-  const pendingCount =
-    subscriptions.filter(
-      (item) =>
-        item.status === "pending"
-    ).length;
+  const approvedCount = subscriptions.filter(
+    (item) => item.status === "approved"
+  ).length;
 
-  const approvedCount =
-    subscriptions.filter(
-      (item) =>
-        item.status === "approved"
-    ).length;
-
-  const declinedCount =
-    subscriptions.filter(
-      (item) =>
-        item.status === "declined"
-    ).length;
-
-  // ===================================================
-  // UI
-  // ===================================================
+  const declinedCount = subscriptions.filter(
+    (item) => item.status === "declined"
+  ).length;
 
   return (
     <div style={styles.container}>
-
-      {/* SIDEBAR */}
-
       <Sidebar />
 
-      {/* MAIN CONTENT */}
-
-      <main style={styles.content}>
-
-        <div style={styles.page}>
-
-          {/* =========================================
-              PAGE HEADER
-          ========================================= */}
-
-          <div style={styles.header}>
-
-            <div style={styles.headerContent}>
-
-              <div style={styles.eyebrow}>
+      <main
+        className="subscription-content"
+        style={styles.content}
+      >
+        <div
+          className="subscription-page"
+          style={styles.page}
+        >
+          {/* HEADER */}
+          <div
+            className="subscription-header"
+            style={styles.header}
+          >
+            <div style={styles.headerLeft}>
+              <p style={styles.eyebrow}>
                 AMRUTHAHARA ADMIN
-              </div>
+              </p>
 
-              <h1 style={styles.title}>
+              <h1
+                className="subscription-header-title"
+                style={styles.title}
+              >
                 Subscription Management
               </h1>
 
-              <p style={styles.subtitle}>
-                Review customer subscription
-                requests and manage their
-                approval status.
+              <p
+                className="subscription-header-subtitle"
+                style={styles.subtitle}
+              >
+                Review and manage customer subscription requests.
               </p>
-
             </div>
 
             <button
-              type="button"
-              onClick={fetchSubscriptions}
+              className="subscription-refresh-button"
               style={styles.refreshButton}
+              onClick={fetchSubscriptions}
+              disabled={loading}
             >
-              <span style={styles.refreshIcon}>
-                ↻
-              </span>
-
-              Refresh
+              {loading ? "Refreshing..." : "↻ Refresh"}
             </button>
-
           </div>
 
-          {/* =========================================
-              SUMMARY CARDS
-          ========================================= */}
-
-          <div style={styles.summaryGrid}>
-
-            {/* TOTAL */}
-
+          {/* SUMMARY */}
+          <div
+            className="subscription-summary-grid"
+            style={styles.summaryGrid}
+          >
             <div style={styles.summaryCard}>
-
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#EDF7EF",
-                  color: "#2F6B3F",
-                }}
-              >
-                ✓
-              </div>
-
-              <div style={styles.summaryContent}>
-
-                <div style={styles.summaryNumber}>
-                  {subscriptions.length}
-                </div>
-
-                <div style={styles.summaryLabel}>
-                  Total Requests
-                </div>
-
-              </div>
-
+              <p style={styles.summaryLabel}>
+                Total Requests
+              </p>
+              <p style={styles.summaryValue}>
+                {subscriptions.length}
+              </p>
             </div>
 
-            {/* PENDING */}
-
             <div style={styles.summaryCard}>
-
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#FFF8E8",
-                  color: "#8A6A2F",
-                }}
-              >
-                ◷
-              </div>
-
-              <div style={styles.summaryContent}>
-
-                <div style={styles.summaryNumber}>
-                  {pendingCount}
-                </div>
-
-                <div style={styles.summaryLabel}>
-                  Pending
-                </div>
-
-              </div>
-
+              <p style={styles.summaryLabel}>
+                Pending
+              </p>
+              <p style={styles.summaryValue}>
+                {pendingCount}
+              </p>
             </div>
 
-            {/* APPROVED */}
-
             <div style={styles.summaryCard}>
-
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#EDF7EF",
-                  color: "#2F6B3F",
-                }}
-              >
-                ✓
-              </div>
-
-              <div style={styles.summaryContent}>
-
-                <div style={styles.summaryNumber}>
-                  {approvedCount}
-                </div>
-
-                <div style={styles.summaryLabel}>
-                  Approved
-                </div>
-
-              </div>
-
+              <p style={styles.summaryLabel}>
+                Approved
+              </p>
+              <p style={styles.summaryValue}>
+                {approvedCount}
+              </p>
             </div>
 
-            {/* DECLINED */}
-
             <div style={styles.summaryCard}>
-
-              <div
-                style={{
-                  ...styles.summaryIcon,
-                  background: "#FDECEC",
-                  color: "#B42318",
-                }}
-              >
-                ×
-              </div>
-
-              <div style={styles.summaryContent}>
-
-                <div style={styles.summaryNumber}>
-                  {declinedCount}
-                </div>
-
-                <div style={styles.summaryLabel}>
-                  Declined
-                </div>
-
-              </div>
-
+              <p style={styles.summaryLabel}>
+                Declined
+              </p>
+              <p style={styles.summaryValue}>
+                {declinedCount}
+              </p>
             </div>
-
           </div>
 
-          {/* =========================================
-              ERROR
-          ========================================= */}
-
+          {/* ALERTS */}
           {error && (
-            <div style={styles.error}>
-
-              <span style={styles.alertIcon}>
-                !
-              </span>
-
-              <span>
-                {error}
-              </span>
-
+            <div
+              style={{
+                ...styles.alert,
+                ...styles.error,
+              }}
+            >
+              {error}
             </div>
           )}
-
-          {/* =========================================
-              SUCCESS
-          ========================================= */}
 
           {feedback && (
-            <div style={styles.success}>
-
-              <span style={styles.alertIcon}>
-                ✓
-              </span>
-
-              <span>
-                {feedback}
-              </span>
-
+            <div
+              style={{
+                ...styles.alert,
+                ...styles.success,
+              }}
+            >
+              {feedback}
             </div>
           )}
 
-          {/* =========================================
-              MAIN CARD
-          ========================================= */}
+          {/* MAIN CARD */}
+          <section style={styles.mainCard}>
+            <div
+              className="subscription-card-header"
+              style={styles.cardHeader}
+            >
+              <p style={styles.cardEyebrow}>
+                CUSTOMER REQUESTS
+              </p>
 
-          <div style={styles.card}>
-
-            {/* CARD HEADER */}
-
-            <div style={styles.cardHeader}>
-
-              <div>
-
-                <div style={styles.cardEyebrow}>
-                  CUSTOMER REQUESTS
-                </div>
-
-                <h2 style={styles.cardTitle}>
-                  Subscription Requests
-                </h2>
-
-                <p style={styles.cardSubtitle}>
-                  All subscription requests submitted
-                  by customers are shown below.
-                </p>
-
-              </div>
-
-              <div style={styles.requestCount}>
-                {subscriptions.length}{" "}
-                {subscriptions.length === 1
-                  ? "Request"
-                  : "Requests"}
-              </div>
-
+              <h2 style={styles.cardTitle}>
+                Subscription Requests
+              </h2>
             </div>
 
-            {/* =======================================
-                LOADING
-            ======================================= */}
-
             {loading ? (
-
-              <div style={styles.center}>
-
-                <div
-                  style={styles.spinner}
-                  className="subscription-spinner"
-                ></div>
-
-                <div style={styles.loadingTitle}>
-                  Loading subscriptions
-                </div>
-
-                <div style={styles.loadingText}>
-                  Please wait while we fetch
-                  the requests.
-                </div>
-
+              <div style={styles.loading}>
+                Loading subscription requests...
               </div>
-
             ) : subscriptions.length === 0 ? (
-
-              /* =====================================
-                 EMPTY
-              ===================================== */
-
               <div style={styles.empty}>
-
-                <div style={styles.emptyIcon}>
-                  ✦
-                </div>
-
                 <h3 style={styles.emptyTitle}>
                   No subscription requests
                 </h3>
 
                 <p style={styles.emptyText}>
-                  Customer subscription requests
-                  will appear here once they are
-                  submitted.
+                  There are currently no customer subscription
+                  requests to display.
                 </p>
 
                 <button
-                  type="button"
-                  onClick={fetchSubscriptions}
+                  className="subscription-empty-button"
                   style={styles.emptyButton}
+                  onClick={fetchSubscriptions}
                 >
                   Refresh Requests
                 </button>
-
               </div>
-
             ) : (
+              <div
+                className="subscription-list"
+                style={styles.list}
+              >
+                {subscriptions.map((item, index) => {
+                  const customer =
+                    item.user ||
+                    item.customer ||
+                    item;
 
-              /* =====================================
-                 REQUEST LIST
-              ===================================== */
+                  const name =
+                    customer?.name ||
+                    customer?.fullName ||
+                    "Customer";
 
-              <div style={styles.list}>
+                  const email =
+                    customer?.email ||
+                    item.email ||
+                    "No email";
 
-                {subscriptions.map(
-                  (item, index) => (
+                  const phone =
+                    customer?.phone ||
+                    item.phone ||
+                    "No phone";
 
-                    <div
-                      key={item._id}
+                  const initials = name
+                    .split(" ")
+                    .map((part) => part.charAt(0))
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase();
+
+                  const status =
+                    item.status || "pending";
+
+                  const plan =
+                    PLAN_LABELS[item.plan] ||
+                    item.plan ||
+                    "—";
+
+                  const days =
+                    item.days ||
+                    item.duration ||
+                    "—";
+
+                  return (
+                    <article
+                      className="subscription-request-card"
                       style={styles.requestCard}
+                      key={item._id || index}
                     >
-
-                      {/* ==========================
-                          CUSTOMER HEADER
-                      ========================== */}
-
+                      {/* REQUEST HEADER */}
                       <div
-                        style={
-                          styles.requestHeader
-                        }
+                        className="subscription-request-header"
+                        style={styles.requestHeader}
                       >
-
                         <div
-                          style={
-                            styles.customerSection
-                          }
+                          className="subscription-customer-section"
+                          style={styles.customerSection}
                         >
-
-                          <div
-                            style={styles.avatar}
-                          >
-                            {(item.name || "U")
-                              .charAt(0)
-                              .toUpperCase()}
+                          <div style={styles.avatar}>
+                            {initials}
                           </div>
 
-                          <div
-                            style={{
-                              minWidth: 0,
-                            }}
-                          >
+                          <div style={styles.customerInfo}>
+                            <p style={styles.requestNumber}>
+                              REQUEST #{index + 1}
+                            </p>
+
+                            <h3 style={styles.customerName}>
+                              {name}
+                            </h3>
 
                             <div
-                              style={
-                                styles.requestNumber
-                              }
+                              className="subscription-contact-row"
+                              style={styles.contactRow}
                             >
-                              REQUEST #
-                              {String(index + 1)
-                                .padStart(2, "0")}
+                              <p style={styles.contactText}>
+                                {email}
+                              </p>
+
+                              <p style={styles.contactText}>
+                                {phone}
+                              </p>
                             </div>
-
-                            <div
-                              style={
-                                styles.requestName
-                              }
-                            >
-                              {item.name ||
-                                "Unnamed Customer"}
-                            </div>
-
-                            <div
-                              style={
-                                styles.contactRow
-                              }
-                            >
-
-                              <span>
-                                ✉{" "}
-                                {item.email ||
-                                  "No email"}
-                              </span>
-
-                              <span>
-                                ☎{" "}
-                                {item.phone ||
-                                  "No phone"}
-                              </span>
-
-                            </div>
-
                           </div>
-
                         </div>
 
-                        {/* STATUS */}
-
                         <div
-                          style={
-                            styles.statusSection
-                          }
+                          className="subscription-status-section"
+                          style={styles.statusSection}
                         >
-
-                          <div
-                            style={
-                              styles.statusHeading
-                            }
-                          >
-                            CURRENT STATUS
-                          </div>
-
                           <span
                             style={{
-                              ...styles.badge,
-                              ...statusStyle(
-                                item.status
-                              ),
+                              ...styles.statusBadge,
+                              ...statusStyle(status),
                             }}
                           >
+                            {STATUS_LABELS[status] ||
+                              status}
+                          </span>
+                        </div>
+                      </div>
 
-                            <span
-                              style={
-                                styles.badgeDot
-                              }
-                            ></span>
+                      {/* DETAILS */}
+                      <div
+                        className="subscription-details-grid"
+                        style={styles.detailsContainer}
+                      >
+                        <div style={styles.detailItem}>
+                          <p style={styles.detailLabel}>
+                            PLAN
+                          </p>
 
-                            {STATUS_LABELS[
-                              item.status
-                            ] ||
-                              item.status ||
-                              "Pending"}
+                          <p style={styles.detailValue}>
+                            {plan}
+                          </p>
+                        </div>
 
+                        <div style={styles.detailItem}>
+                          <p style={styles.detailLabel}>
+                            DAYS
+                          </p>
+
+                          <p style={styles.detailValue}>
+                            {days}
+                          </p>
+                        </div>
+
+                        <div style={styles.detailItem}>
+                          <p style={styles.detailLabel}>
+                            REQUESTED
+                          </p>
+
+                          <p style={styles.detailValue}>
+                            {formatDate(
+                              item.createdAt ||
+                                item.requestedAt
+                            )}
+                          </p>
+                        </div>
+
+                        <div style={styles.detailItem}>
+                          <p style={styles.detailLabel}>
+                            LAST UPDATED
+                          </p>
+
+                          <p style={styles.detailValue}>
+                            {formatDate(
+                              item.updatedAt
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* NOTES */}
+                      {item.notes && (
+                        <div style={styles.notes}>
+                          <p style={styles.notesLabel}>
+                            CUSTOMER NOTES
+                          </p>
+
+                          <p style={styles.notesText}>
+                            {item.notes}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* ACTION AREA */}
+                      <div
+                        className="subscription-action-area"
+                        style={styles.actionArea}
+                      >
+                        <p style={styles.actionText}>
+                          Update the current subscription status.
+                        </p>
+
+                        <div
+                          className="subscription-status-control"
+                          style={styles.statusControl}
+                        >
+                          <span
+                            style={
+                              styles.statusControlLabel
+                            }
+                          >
+                            STATUS
                           </span>
 
-                        </div>
-
-                      </div>
-
-                      {/* ==========================
-                          DETAILS
-                      ========================== */}
-
-                      <div
-                        style={
-                          styles.detailsContainer
-                        }
-                      >
-
-                        {/* PLAN */}
-
-                        <div
-                          style={
-                            styles.detailItem
-                          }
-                        >
-
-                          <div
-                            style={
-                              styles.detailIcon
-                            }
-                          >
-                            ◉
-                          </div>
-
-                          <div
-                            style={
-                              styles.detailContent
-                            }
-                          >
-
-                            <div
-                              style={
-                                styles.detailLabel
-                              }
-                            >
-                              PLAN
-                            </div>
-
-                            <div
-                              style={
-                                styles.detailValue
-                              }
-                            >
-                              {PLAN_LABELS[
-                                item.plan
-                              ] ||
-                                item.plan ||
-                                "—"}
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                        {/* DAYS */}
-
-                        <div
-                          style={
-                            styles.detailItem
-                          }
-                        >
-
-                          <div
-                            style={
-                              styles.detailIcon
-                            }
-                          >
-                            #
-                          </div>
-
-                          <div
-                            style={
-                              styles.detailContent
-                            }
-                          >
-
-                            <div
-                              style={
-                                styles.detailLabel
-                              }
-                            >
-                              DAYS
-                            </div>
-
-                            <div
-                              style={
-                                styles.detailValue
-                              }
-                            >
-                              {item.days || "—"}
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                        {/* REQUESTED */}
-
-                        <div
-                          style={
-                            styles.detailItem
-                          }
-                        >
-
-                          <div
-                            style={
-                              styles.detailIcon
-                            }
-                          >
-                            +
-                          </div>
-
-                          <div
-                            style={
-                              styles.detailContent
-                            }
-                          >
-
-                            <div
-                              style={
-                                styles.detailLabel
-                              }
-                            >
-                              REQUESTED
-                            </div>
-
-                            <div
-                              style={
-                                styles.detailValue
-                              }
-                            >
-                              {formatDate(
-                                item.createdAt
-                              )}
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                        {/* UPDATED */}
-
-                        <div
-                          style={
-                            styles.detailItem
-                          }
-                        >
-
-                          <div
-                            style={
-                              styles.detailIcon
-                            }
-                          >
-                            ↻
-                          </div>
-
-                          <div
-                            style={
-                              styles.detailContent
-                            }
-                          >
-
-                            <div
-                              style={
-                                styles.detailLabel
-                              }
-                            >
-                              LAST UPDATED
-                            </div>
-
-                            <div
-                              style={
-                                styles.detailValue
-                              }
-                            >
-                              {formatDate(
-                                item.updatedAt
-                              )}
-                            </div>
-
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                      {/* ==========================
-                          NOTES
-                      ========================== */}
-
-                      <div style={styles.notes}>
-
-                        <div
-                          style={styles.notesLabel}
-                        >
-                          CUSTOMER NOTES
-                        </div>
-
-                        <div
-                          style={styles.notesValue}
-                        >
-                          {item.notes ||
-                            "No additional notes provided."}
-                        </div>
-
-                      </div>
-
-                      {/* ==========================
-                          STATUS ACTION
-                      ========================== */}
-
-                      <div
-                        style={
-                          styles.actionArea
-                        }
-                      >
-
-                        <div
-                          style={
-                            styles.actionInfo
-                          }
-                        >
-
-                          <div
-                            style={
-                              styles.actionTitle
-                            }
-                          >
-                            Manage Request
-                          </div>
-
-                          <div
-                            style={
-                              styles.actionDescription
-                            }
-                          >
-                            Change the subscription
-                            status to update the
-                            customer's dashboard.
-                          </div>
-
-                        </div>
-
-                        <div
-                          style={
-                            styles.statusControl
-                          }
-                        >
-
                           <select
-                            value={
-                              item.status ||
-                              "pending"
-                            }
+                            className="subscription-select"
+                            style={styles.select}
+                            value={status}
                             disabled={
-                              updatingId ===
-                              item._id
+                              updatingId === item._id
                             }
                             onChange={(event) =>
                               updateStatus(
@@ -1525,19 +885,7 @@ function AdminSubscriptions() {
                                 event.target.value
                               )
                             }
-                            style={{
-                              ...styles.select,
-                              opacity:
-                                updatingId ===
-                                item._id
-                                  ? 0.6
-                                  : 1,
-                            }}
-                            aria-label={`Update status for ${
-                              item.name
-                            }`}
                           >
-
                             <option value="pending">
                               Pending
                             </option>
@@ -1549,238 +897,122 @@ function AdminSubscriptions() {
                             <option value="declined">
                               Declined
                             </option>
-
                           </select>
-
-                          {updatingId ===
-                          item._id ? (
-                            <span
-                              style={
-                                styles.updating
-                              }
-                            >
-                              Updating...
-                            </span>
-                          ) : null}
-
                         </div>
-
                       </div>
-
-                    </div>
-
-                  )
-                )}
-
+                    </article>
+                  );
+                })}
               </div>
-
             )}
-
-          </div>
-
+          </section>
         </div>
-
       </main>
 
-      {/* ===========================================
-          RESPONSIVE CSS
-      =========================================== */}
-
       <style>{`
-
-        .subscription-spinner {
-          animation:
-            subscriptionSpin
-            1s linear infinite;
+        * {
+          box-sizing: border-box;
         }
 
-        .subscription-refresh-button {
-          transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
+        .subscription-content {
+          min-width: 0;
+        }
+
+        .subscription-page {
+          min-width: 0;
+          max-width: 100%;
         }
 
         .subscription-refresh-button:hover {
-          transform: translateY(-1px);
-          box-shadow:
-            0 8px 18px
-            rgba(23, 96, 57, 0.12);
+          background: #F3F7F0 !important;
+          border-color: #C7D4C1 !important;
         }
 
-        .subscription-empty-button {
-          transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
-        }
-
-        .subscription-empty-button:hover {
-          transform: translateY(-1px);
-          box-shadow:
-            0 8px 18px
-            rgba(23, 96, 57, 0.20);
-        }
-
-        .subscription-select {
-          outline: none;
-          transition:
-            border-color 0.2s ease,
-            box-shadow 0.2s ease;
-        }
-
-        .subscription-select:focus {
-          border-color: #8caf91 !important;
-          box-shadow:
-            0 0 0 3px
-            rgba(47, 107, 63, 0.08);
-        }
-
-        .subscription-select:disabled {
+        .subscription-refresh-button:disabled {
+          opacity: 0.65;
           cursor: not-allowed;
         }
 
-        @keyframes subscriptionSpin {
-          from {
-            transform: rotate(0deg);
-          }
-
-          to {
-            transform: rotate(360deg);
-          }
+        .subscription-empty-button:hover {
+          background: #40583B !important;
         }
 
-        /* =========================================
-           TABLET
-        ========================================= */
+        .subscription-select:focus {
+          border-color: #809478 !important;
+          box-shadow: 0 0 0 3px rgba(91, 116, 82, 0.1);
+        }
+
+        .subscription-select:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .subscription-request-card:last-child {
+          margin-bottom: 0 !important;
+        }
 
         @media (max-width: 1250px) {
-
-          main {
-            margin-left: 250px;
-            width: calc(100% - 250px);
-          }
-
           .subscription-summary-grid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
           }
 
           .subscription-details-grid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
           }
-
         }
 
-        /* =========================================
-           SMALL TABLET
-        ========================================= */
-
         @media (max-width: 1100px) {
-
-          main {
+          .subscription-content {
             margin-left: 0 !important;
             width: 100% !important;
           }
-
         }
 
-        /* =========================================
-           MOBILE
-        ========================================= */
-
         @media (max-width: 850px) {
-
-          main {
+          .subscription-content {
             padding: 24px 20px !important;
-          }
-
-          .subscription-summary-grid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr)) !important;
-          }
-
-          .subscription-details-grid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr)) !important;
-          }
-
-          .subscription-header-title {
-            font-size: 32px !important;
           }
 
           .subscription-header {
             align-items: flex-start !important;
           }
 
-          .subscription-card-header {
-            align-items: flex-start !important;
-            flex-direction: column !important;
+          .subscription-header-title {
+            font-size: 32px !important;
           }
 
           .subscription-request-header {
-            flex-direction: column !important;
+            align-items: flex-start !important;
           }
 
           .subscription-status-section {
-            width: 100% !important;
-            text-align: left !important;
+            padding-top: 2px;
           }
 
           .subscription-action-area {
-            flex-direction: column !important;
-            align-items: stretch !important;
+            align-items: flex-start !important;
           }
 
           .subscription-status-control {
-            width: 100% !important;
+            min-width: 0 !important;
           }
 
           .subscription-select {
-            width: 100% !important;
+            width: 180px !important;
           }
-
         }
 
-        /* =========================================
-           MOBILE
-        ========================================= */
-
         @media (max-width: 700px) {
-
-          main {
+          .subscription-content {
             padding: 20px 12px !important;
           }
 
-        }
-
-        /* =========================================
-           SMALL MOBILE
-        ========================================= */
-
-        @media (max-width: 600px) {
-
-          .subscription-page {
-            padding-bottom: 30px !important;
+          .subscription-header {
+            gap: 15px !important;
           }
 
-          .subscription-summary-grid {
-            grid-template-columns: 1fr !important;
-          }
-
-          .subscription-details-grid {
-            grid-template-columns: 1fr !important;
-          }
-
-          .subscription-header-title {
-            font-size: 28px !important;
-          }
-
-          .subscription-header-subtitle {
-            font-size: 12px !important;
-          }
-
-          .subscription-refresh-button {
-            width: 100%;
+          .subscription-card-header {
+            padding: 20px !important;
           }
 
           .subscription-list {
@@ -1791,39 +1023,137 @@ function AdminSubscriptions() {
             padding: 17px !important;
           }
 
+          .subscription-action-area {
+            padding: 15px !important;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .subscription-header {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            margin-bottom: 22px !important;
+          }
+
+          .subscription-header-title {
+            font-size: 28px !important;
+            line-height: 1.2 !important;
+          }
+
+          .subscription-header-subtitle {
+            font-size: 12px !important;
+          }
+
+          .subscription-refresh-button {
+            width: 100% !important;
+            min-height: 42px;
+          }
+
+          .subscription-summary-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            margin-bottom: 18px !important;
+          }
+
+          .subscription-summary-grid > div {
+            padding: 16px !important;
+          }
+
+          .subscription-request-header {
+            flex-direction: column !important;
+            gap: 14px !important;
+          }
+
           .subscription-customer-section {
+            width: 100% !important;
+          }
+
+          .subscription-status-section {
+            width: 100% !important;
+            padding-top: 0 !important;
+          }
+
+          .subscription-status-section span {
             width: 100%;
           }
 
           .subscription-contact-row {
             flex-direction: column !important;
             align-items: flex-start !important;
-            gap: 4px !important;
+            gap: 3px !important;
           }
 
           .subscription-details-grid {
+            grid-template-columns: 1fr !important;
             gap: 1px !important;
           }
 
-          .subscription-action-area {
-            padding: 15px !important;
+          .subscription-details-grid > div {
+            padding: 14px 16px !important;
           }
 
-          .subscription-card-header {
-            padding: 20px !important;
+          .subscription-action-area {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+          }
+
+          .subscription-action-area > p {
+            width: 100%;
           }
 
           .subscription-status-control {
-            min-width: 0 !important;
+            width: 100% !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 7px !important;
           }
 
+          .subscription-status-control .subscription-select {
+            width: 100% !important;
+          }
+
+          .subscription-card-header {
+            padding: 18px !important;
+          }
+
+          .subscription-card-header h2 {
+            font-size: 19px !important;
+          }
+
+          .subscription-request-card {
+            border-radius: 12px !important;
+          }
+
+          .subscription-list {
+            padding: 10px !important;
+          }
+
+          .subscription-page {
+            overflow-x: hidden !important;
+          }
         }
 
-      `}</style>
+        @media (max-width: 380px) {
+          .subscription-content {
+            padding: 18px 9px !important;
+          }
 
+          .subscription-header-title {
+            font-size: 25px !important;
+          }
+
+          .subscription-customer-section {
+            gap: 10px !important;
+          }
+
+          .subscription-customer-section > div:first-child {
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
-
-export default AdminSubscriptions;
-
