@@ -77,16 +77,18 @@ function Sidebar() {
           mobileOpen ? "admin-sidebar-open" : ""
         }`}
       >
-        {/* BRAND */}
-        <div className="admin-sidebar-brand">
-          <div className="admin-brand-icon">
-            <FaLeaf size={21} />
-          </div>
- 
-          <h2>Amruthahara</h2>
- 
-          <p>Admin Panel</p>
-        </div>
+      {/* BRAND */}
+<div className="admin-sidebar-brand">
+  <img
+    src="/images/amruthahara-logo.png"
+    alt="Amruthahara Logo"
+    className="admin-sidebar-logo"
+  />
+
+  <h2>Amruthahara</h2>
+
+  <p>Admin Panel</p>
+</div>
  
         {/* MOBILE CLOSE */}
         <button
