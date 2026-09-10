@@ -914,19 +914,7 @@ function Dashboard() {
               style={styles.heroLeaf}
             />
  
-            <div style={styles.heroContent}>
-
-  <img
-    src="/images/amruthahara-logo.png"
-    alt="Amruthahara Logo"
-    style={{
-      width: "70px",
-      height: "70px",
-      objectFit: "contain",
-      marginBottom: "18px",
-    }}
-  />
-
+           <div style={styles.heroContent}>
   <div
     className="dashboard-eyebrow"
     style={styles.eyebrow}
