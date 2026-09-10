@@ -915,10 +915,22 @@ function Dashboard() {
             />
  
             <div style={styles.heroContent}>
-              <div
-                className="dashboard-eyebrow"
-                style={styles.eyebrow}
-              >
+
+  <img
+    src="/images/amruthahara-logo.png"
+    alt="Amruthahara Logo"
+    style={{
+      width: "70px",
+      height: "70px",
+      objectFit: "contain",
+      marginBottom: "18px",
+    }}
+  />
+
+  <div
+    className="dashboard-eyebrow"
+    style={styles.eyebrow}
+  >
                 <FaLeaf size={10} />
                 Amruthahara Administration
               </div>
