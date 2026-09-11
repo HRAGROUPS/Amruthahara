@@ -1165,7 +1165,7 @@ function Navbar() {
           onClick={closeMobileMenu}
         >
           <img
-            src="/images/amruthahara-logo.WEBP"
+            src="/images/amruthahara-logo.webp"
             alt="Amruthahara"
             className="amruthahara-logo-image"
           />
