@@ -29,7 +29,7 @@ const categories = [
   [
     "Fruits",
     "Slow pressed, full of natural goodness",
-    "/images/fruits.webp",
+    "/images/fruits image.webp",
   ],
   [
     "Honey",
