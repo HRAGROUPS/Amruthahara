@@ -36,10 +36,10 @@ const categories = [
     "Golden, traditional pantry favourites",
     "https://foodcare.in/cdn/shop/files/honey_5e6a76b4-51e2-4d60-99d1-4fcc988e9370.png?v=1768271233",
   ],
-  [
+   [
     "Vegetables",
     "Ancient grains for modern kitchens",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmNdRl4vDC-0wCrauzr5TLpjPveaIBcb7lcdflKOe4Aa4olVvXjV6mVC28&s=10",
+    "/images/vegetables.webp",
   ],
   [
     "Wellness boxes",
