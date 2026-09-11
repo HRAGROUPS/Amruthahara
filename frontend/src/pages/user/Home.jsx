@@ -41,11 +41,13 @@ const categories = [
     "Ancient grains for modern kitchens",
     "/images/vegetables.webp",
   ],
-  [
+ 
+    [
     "Wellness boxes",
     "Honest flavour, thoughtfully made",
-    "https://images.squarespace-cdn.com/content/v1/68a29a1723e21754f867ce91/a26c5af8-1ec0-4bab-8e4a-83b1a50bbdb1/OurRange-FruitBoxes-Block3-Pic1.jpg",
+    "/images/fruitsboxes.webp",
   ],
+  
 ];
 
 const featured = [
