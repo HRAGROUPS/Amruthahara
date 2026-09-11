@@ -45,7 +45,7 @@ const categories = [
     [
     "Wellness boxes",
     "Honest flavour, thoughtfully made",
-    "/images/fruitsboxes.webp",
+    "/images/FruitBoxes.webp",
   ],
   
 ];
