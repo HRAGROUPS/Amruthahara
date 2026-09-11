@@ -29,7 +29,7 @@ const categories = [
   [
     "Fruits",
     "Slow pressed, full of natural goodness",
-    "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2021/09/27/all-the-fruits-cut-whole.jpg.rend.hgtvcom.1280.960.85.suffix/1632778035320.webp",
+    "/images/fruits.webp",
   ],
   [
     "Honey",
