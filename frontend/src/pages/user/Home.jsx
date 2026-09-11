@@ -113,17 +113,17 @@ const stories = [
   [
     "Everyday Wellness",
     "5 nourishing breakfast ideas for busy mornings",
-    "/Videos/everyday-wellness.mp4",
+  
   ],
   [
     "Know Your Food",
     "How to choose a genuinely pure cooking oil",
-    "/Videos/know-your-food.mp4",
+   
   ],
   [
     "Traditional Wisdom",
     "Why millets belong in every modern kitchen",
-    "/Videos/traditional-wisdom.mp4",
+   
   ],
 ];
 
